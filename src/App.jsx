@@ -2,7 +2,7 @@ import { useState } from 'react';
 import './App.css';
 
 // ⚠️ IMPORTANT: Replace this with YOUR Vercel backend URL ⚠️
-const API_URL = 'https://section-swap-backend-di1fsxsag-yowitsdwins-projects.vercel.app/api';
+const API_URL = 'https://section-swap-backend.vercel.app/api';
 
 function App() {
   const [step, setStep] = useState(1);
