@@ -151,7 +151,7 @@ function App() {
                 <label>Your Current Section:</label>
                 <input
                   type="text"
-                  placeholder="e.g., A, B, C, CS-1A"
+                  placeholder="eg, 1"
                   value={formData.currentSection}
                   onChange={(e) => setFormData({...formData, currentSection: e.target.value})}
                   required
@@ -162,7 +162,7 @@ function App() {
                 <label>Section You Want:</label>
                 <input
                   type="text"
-                  placeholder="e.g., A, B, C, CS-1A"
+                  placeholder="e.g., 2"
                   value={formData.desiredSection}
                   onChange={(e) => setFormData({...formData, desiredSection: e.target.value})}
                   required
