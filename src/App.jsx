@@ -7,11 +7,12 @@ const API_URL = 'https://section-swap-backend.vercel.app/api';
 function App() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    name: '',
-    yearLevel: '',
-    currentSection: '',
-    desiredSection: ''
-  });
+  name: '',
+  email: '', // Add this
+  yearLevel: '',
+  currentSection: '',
+  desiredSection: ''
+});
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
 
@@ -59,23 +60,35 @@ function App() {
 
         {/* STEP 1: Enter Name */}
         {step === 1 && (
-          <div className="form-step">
-            <h2>What's your name?</h2>
-            <input
-              type="text"
-              placeholder="Enter your full name"
-              value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
-              autoFocus
-            />
-            <button 
-              onClick={() => setStep(2)}
-              disabled={!formData.name.trim()}
-            >
-              Next →
-            </button>
-          </div>
-        )}
+  <div className="form-step">
+    <h2>Let's get started</h2>
+    
+    <label>Full Name</label>
+    <input
+      type="text"
+      placeholder="Enter your full name"
+      value={formData.name}
+      onChange={(e) => setFormData({...formData, name: e.target.value})}
+      autoFocus
+    />
+    
+    <label style={{marginTop: '10px', display: 'block'}}>Email (for notifications)</label>
+    <input
+      type="email"
+      placeholder="you@student.cec.edu.ph"
+      value={formData.email}
+      onChange={(e) => setFormData({...formData, email: e.target.value})}
+    />
+    
+    <button 
+      onClick={() => setStep(2)}
+      disabled={!formData.name.trim() || !formData.email.includes('@')}
+      style={{marginTop: '20px'}}
+    >
+      Next →
+    </button>
+  </div>
+)}
 
         {/* STEP 2: Select Year Level */}
         {step === 2 && (
