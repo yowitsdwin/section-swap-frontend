@@ -96,7 +96,7 @@ function App() {
         <div className="loading-content">
           <div className="loading-spinner"></div>
           <h2 className="loading-title">📚 Section Swap</h2>
-          <p className="loading-text">Loading your swap experience...</p>
+          <p className="loading-text">Loading...</p>
         </div>
       </div>
     );
@@ -106,7 +106,7 @@ function App() {
     <div className="app">
       <div className="container">
         <h1>📚 Section Swap</h1>
-        <p className="subtitle">Trade class sections with fellow students</p>
+        <p className="subtitle">NOTE: SWAPPING OF SCHEDULE STILL DEPEND ON THE EDP.</p>
 
         {/* STEP 1: Enter Name & Email */}
         {step === 1 && (
