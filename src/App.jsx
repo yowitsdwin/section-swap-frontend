@@ -75,7 +75,7 @@ function App() {
     <label style={{marginTop: '10px', display: 'block'}}>Email (for notifications)</label>
     <input
       type="email"
-      placeholder="you@student.cec.edu.ph"
+      placeholder="email@gmail.com"
       value={formData.email}
       onChange={(e) => setFormData({...formData, email: e.target.value})}
     />
