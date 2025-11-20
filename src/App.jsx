@@ -1,15 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 
-// ⚠️ IMPORTANT: Ensure this matches your Vercel Backend URL
 const API_URL = 'https://section-swap-backend.vercel.app/api'; 
-// ^ If you haven't switched to the main domain yet, use your specific one:
-// const API_URL = 'https://section-swap-backend-9y6q6gmz7-yowitsdwins-projects.vercel.app/api';
 
 function App() {
   const [step, setStep] = useState(1);
-  
-  // Added 'email' to state
+  const [appLoading, setAppLoading] = useState(true); // Initial app load
   const [formData, setFormData] = useState({
     name: '',
     email: '', 
@@ -20,15 +16,35 @@ function App() {
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
-  // Added error state for Rate Limiting messages
   const [errorMessage, setErrorMessage] = useState('');
 
   const yearLevels = ['1st Year', '2nd Year', '3rd Year'];
 
+  // Simulate initial app loading (check backend health)
+  useEffect(() => {
+    const initializeApp = async () => {
+      try {
+        // Optional: Check if backend is alive
+        await fetch(`${API_URL}/health`);
+        
+        // Minimum loading time for smooth UX (adjust as needed)
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        setAppLoading(false);
+      } catch (error) {
+        console.error('Backend health check failed:', error);
+        // Still load the app even if health check fails
+        setAppLoading(false);
+      }
+    };
+
+    initializeApp();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setErrorMessage(''); // Clear previous errors
+    setErrorMessage('');
     
     try {
       const response = await fetch(`${API_URL}/swap-request`, {
@@ -37,17 +53,15 @@ function App() {
         body: JSON.stringify(formData)
       });
 
-      // 🛑 HANDLE 429 (RATE LIMIT) ERROR HERE
       if (response.status === 429) {
         const errorData = await response.json();
-        setErrorMessage("⏳ " + (errorData.error || "Too many requests. Please wait 15 minutes."));
+        setErrorMessage("⏳ " + (errorData.error || "Too many requests. Please wait 5 minutes."));
         setLoading(false);
-        return; // Stop execution here
+        return;
       }
       
       const data = await response.json();
 
-      // Handle generic backend errors
       if (data.error) {
         throw new Error(data.error);
       }
@@ -56,7 +70,6 @@ function App() {
       setStep(4);
     } catch (error) {
       console.error(error);
-      // Set the error message state instead of using alert()
       setErrorMessage(error.message || 'Error submitting request. Please try again.');
     } finally {
       setLoading(false);
@@ -75,6 +88,19 @@ function App() {
     });
     setResult(null);
   };
+
+  // 🎨 LOADING SCREEN
+  if (appLoading) {
+    return (
+      <div className="loading-screen">
+        <div className="loading-content">
+          <div className="loading-spinner"></div>
+          <h2 className="loading-title">📚 Section Swap</h2>
+          <p className="loading-text">Loading your swap experience...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app">
@@ -110,7 +136,6 @@ function App() {
 
             <button 
               onClick={() => setStep(2)}
-              // Disable if name is empty OR email doesn't contain '@'
               disabled={!formData.name.trim() || !formData.email.includes('@')}
             >
               Next →
@@ -151,7 +176,7 @@ function App() {
                 <label>Your Current Section:</label>
                 <input
                   type="text"
-                  placeholder="eg, 1"
+                  placeholder="e.g., 1"
                   value={formData.currentSection}
                   onChange={(e) => setFormData({...formData, currentSection: e.target.value})}
                   required
@@ -169,28 +194,27 @@ function App() {
                 />
               </div>
 
-              {/* 🔴 ERROR MESSAGE DISPLAY */}
               {errorMessage && (
-                <div style={{
-                  padding: '12px',
-                  backgroundColor: '#ffebee',
-                  color: '#c62828',
-                  borderRadius: '8px',
-                  marginBottom: '15px',
-                  fontSize: '0.9rem',
-                  border: '1px solid #ffcdd2'
-                }}>
+                <div className="error-message">
                   {errorMessage}
                 </div>
               )}
 
               <button type="submit" disabled={loading}>
-                {loading ? '🔍 Finding Match...' : 'Find Match'}
+                {loading ? (
+                  <span className="button-loading">
+                    <span className="button-spinner"></span>
+                    Finding Match...
+                  </span>
+                ) : (
+                  'Find Match'
+                )}
               </button>
               <button 
                 type="button" 
                 className="back-btn" 
                 onClick={() => setStep(2)}
+                disabled={loading}
               >
                 ← Back
               </button>

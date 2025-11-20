@@ -5,7 +5,7 @@
   box-sizing: border-box;
 }
 
-/* BODY - Responsive Background */
+/* BODY */
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -14,14 +14,98 @@ body {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  /* Ensure base text color is dark, though container overrides this */
   color: #333; 
+}
+
+/* 🎨 LOADING SCREEN */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.loading-content {
+  text-align: center;
+  color: white;
+}
+
+.loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  margin: 0 auto 30px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-title {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+
+.loading-text {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
+/* BUTTON LOADING STATE */
+.button-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.button-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* ERROR MESSAGE STYLING */
+.error-message {
+  padding: 12px;
+  background-color: #ffebee;
+  color: #c62828;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  border: 1px solid #ffcdd2;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* MAIN APP WRAPPER */
 .app {
   width: 100%;
-  /* Responsive Width: 90% on mobile, max 500px on desktop */
   max-width: 500px;
   margin: 0 auto;
 }
@@ -33,7 +117,6 @@ body {
   padding: 40px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   width: 100%;
-  /* Force all text inside the white card to be dark */
   color: #333; 
 }
 
@@ -42,14 +125,14 @@ h1 {
   text-align: center;
   color: #333;
   margin-bottom: 10px;
-  font-size: 2rem; /* Scalable unit */
+  font-size: 2rem;
 }
 
 h2 {
   color: #333;
   margin-bottom: 20px;
   font-size: 1.5rem;
-  text-align: center; /* Center titles on mobile looks better */
+  text-align: center;
 }
 
 .subtitle {
@@ -70,16 +153,16 @@ h2 {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* INPUTS & LABELS - FIXED COLOR ISSUE HERE */
+/* INPUTS & LABELS */
 .form-group {
   margin-bottom: 20px;
-  text-align: left; /* Ensure labels align left even if parent centers */
+  text-align: left;
 }
 
 label {
   display: block;
   margin-bottom: 8px;
-  color: #333 !important; /* Force dark color (Black/Dark Gray) */
+  color: #333 !important;
   font-weight: 600;
   font-size: 0.95rem;
 }
@@ -89,7 +172,7 @@ input {
   padding: 15px;
   border: 2px solid #e0e0e0;
   border-radius: 10px;
-  font-size: 16px; /* 16px prevents iOS zoom on focus */
+  font-size: 16px;
   transition: border-color 0.3s;
   margin-bottom: 20px;
   background-color: #fff;
@@ -112,13 +195,13 @@ button {
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease; /* Smoother transition */
+  transition: all 0.2s ease;
   margin-bottom: 10px;
 }
 
 button:hover:not(:disabled) {
   background: #5568d3;
-  transform: translateY(-2px); /* Subtle lift effect */
+  transform: translateY(-2px);
 }
 
 button:disabled {
@@ -132,7 +215,7 @@ button:disabled {
   color: #333;
 }
 
-.back-btn:hover {
+.back-btn:hover:not(:disabled) {
   background: #e0e0e0;
 }
 
@@ -148,13 +231,15 @@ button:disabled {
   background: white;
   color: #667eea;
   border: 2px solid #667eea;
-  padding: 15px; /* Slightly smaller padding for mobile */
+  padding: 15px;
   font-size: 18px;
+  transition: all 0.2s ease;
 }
 
 .year-btn:hover {
   background: #667eea;
   color: white;
+  transform: translateY(-2px);
 }
 
 /* RESULTS & MATCH CARD */
@@ -166,7 +251,22 @@ button:disabled {
 .pending-icon {
   font-size: 4rem;
   margin-bottom: 20px;
-  display: block; /* Ensures proper spacing */
+  display: block;
+  animation: bounceIn 0.6s ease-out;
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .match-card {
@@ -175,7 +275,19 @@ button:disabled {
   border-radius: 10px;
   margin: 20px 0;
   border: 2px solid #667eea;
-  text-align: left; /* Better readability for details */
+  text-align: left;
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .match-card p {
@@ -193,18 +305,16 @@ button:disabled {
 
 /* MEDIA QUERIES (RESPONSIVENESS) */
 
-/* Mobile Devices (Small screens) */
+/* Mobile Devices */
 @media (max-width: 480px) {
   body {
-    padding: 10px; /* Less padding on edges */
-    background: #f0f2f5; /* simpler background on weak phones or just keep gradient */
-    /* keeping gradient is fine, just ensure padding isn't too large */
+    padding: 10px;
   }
 
   .container {
-    padding: 25px 20px; /* Tighter padding inside card */
+    padding: 25px 20px;
     border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1); /* Lighter shadow */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
   }
 
   h1 {
@@ -215,8 +325,17 @@ button:disabled {
     font-size: 1.3rem;
   }
 
+  .loading-title {
+    font-size: 2rem;
+  }
+
+  .loading-spinner {
+    width: 50px;
+    height: 50px;
+  }
+
   input {
-    padding: 12px; /* Smaller touch targets OK, but keep font 16px */
+    padding: 12px;
     margin-bottom: 15px;
   }
 
@@ -226,9 +345,9 @@ button:disabled {
   }
 }
 
-/* Tablets (Medium screens) */
+/* Tablets */
 @media (min-width: 481px) and (max-width: 768px) {
   .container {
-    max-width: 90%; /* Use more width on tablets */
+    max-width: 90%;
   }
 }
