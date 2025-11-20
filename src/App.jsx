@@ -1,26 +1,34 @@
 import { useState } from 'react';
 import './App.css';
 
-// ⚠️ IMPORTANT: Replace this with YOUR Vercel backend URL ⚠️
-const API_URL = 'https://section-swap-backend.vercel.app/api';
+// ⚠️ IMPORTANT: Ensure this matches your Vercel Backend URL
+const API_URL = 'https://section-swap-backend.vercel.app/api'; 
+// ^ If you haven't switched to the main domain yet, use your specific one:
+// const API_URL = 'https://section-swap-backend-9y6q6gmz7-yowitsdwins-projects.vercel.app/api';
 
 function App() {
   const [step, setStep] = useState(1);
+  
+  // Added 'email' to state
   const [formData, setFormData] = useState({
-  name: '',
-  email: '', // Add this
-  yearLevel: '',
-  currentSection: '',
-  desiredSection: ''
-});
+    name: '',
+    email: '', 
+    yearLevel: '',
+    currentSection: '',
+    desiredSection: ''
+  });
+
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  // Added error state for Rate Limiting messages
+  const [errorMessage, setErrorMessage] = useState('');
 
   const yearLevels = ['1st Year', '2nd Year', '3rd Year'];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage(''); // Clear previous errors
     
     try {
       const response = await fetch(`${API_URL}/swap-request`, {
@@ -28,13 +36,28 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
+
+      // 🛑 HANDLE 429 (RATE LIMIT) ERROR HERE
+      if (response.status === 429) {
+        const errorData = await response.json();
+        setErrorMessage("⏳ " + (errorData.error || "Too many requests. Please wait 15 minutes."));
+        setLoading(false);
+        return; // Stop execution here
+      }
       
       const data = await response.json();
+
+      // Handle generic backend errors
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
       setResult(data);
       setStep(4);
     } catch (error) {
-      alert('Error submitting request. Please try again.');
       console.error(error);
+      // Set the error message state instead of using alert()
+      setErrorMessage(error.message || 'Error submitting request. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -42,8 +65,10 @@ function App() {
 
   const resetForm = () => {
     setStep(1);
+    setErrorMessage('');
     setFormData({
       name: '',
+      email: '',
       yearLevel: '',
       currentSection: '',
       desiredSection: ''
@@ -54,41 +79,44 @@ function App() {
   return (
     <div className="app">
       <div className="container">
-        {/* 👇 THIS WAS THE FIXED PART 👇 */}
         <h1>📚 Section Swap</h1>
         <p className="subtitle">Trade class sections with fellow students</p>
 
-        {/* STEP 1: Enter Name */}
+        {/* STEP 1: Enter Name & Email */}
         {step === 1 && (
-  <div className="form-step">
-    <h2>Let's get started</h2>
-    
-    <label>Full Name</label>
-    <input
-      type="text"
-      placeholder="Enter your full name"
-      value={formData.name}
-      onChange={(e) => setFormData({...formData, name: e.target.value})}
-      autoFocus
-    />
-    
-    <label style={{marginTop: '10px', display: 'block'}}>Email (for notifications)</label>
-    <input
-      type="email"
-      placeholder="email@gmail.com"
-      value={formData.email}
-      onChange={(e) => setFormData({...formData, email: e.target.value})}
-    />
-    
-    <button 
-      onClick={() => setStep(2)}
-      disabled={!formData.name.trim() || !formData.email.includes('@')}
-      style={{marginTop: '20px'}}
-    >
-      Next →
-    </button>
-  </div>
-)}
+          <div className="form-step">
+            <h2>Let's get started</h2>
+            
+            <div className="form-group">
+              <label>Full Name</label>
+              <input
+                type="text"
+                placeholder="Enter your full name"
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                autoFocus
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Email (for notifications)</label>
+              <input
+                type="email"
+                placeholder="you@student.cec.edu.ph"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+              />
+            </div>
+
+            <button 
+              onClick={() => setStep(2)}
+              // Disable if name is empty OR email doesn't contain '@'
+              disabled={!formData.name.trim() || !formData.email.includes('@')}
+            >
+              Next →
+            </button>
+          </div>
+        )}
 
         {/* STEP 2: Select Year Level */}
         {step === 2 && (
@@ -141,6 +169,21 @@ function App() {
                 />
               </div>
 
+              {/* 🔴 ERROR MESSAGE DISPLAY */}
+              {errorMessage && (
+                <div style={{
+                  padding: '12px',
+                  backgroundColor: '#ffebee',
+                  color: '#c62828',
+                  borderRadius: '8px',
+                  marginBottom: '15px',
+                  fontSize: '0.9rem',
+                  border: '1px solid #ffcdd2'
+                }}>
+                  {errorMessage}
+                </div>
+              )}
+
               <button type="submit" disabled={loading}>
                 {loading ? '🔍 Finding Match...' : 'Find Match'}
               </button>
@@ -169,16 +212,16 @@ function App() {
                   <p>Wants your section: {formData.currentSection}</p>
                 </div>
                 <p className="info-text">
-                  Contact them to coordinate the swap!
+                  We sent an email to <strong>{formData.email}</strong> with the details!
                 </p>
               </>
             ) : (
               <>
                 <div className="pending-icon">⏳</div>
                 <h2>Request Submitted!</h2>
-                <p>We'll notify you when someone with section <strong>{formData.desiredSection}</strong> wants to swap to <strong>{formData.currentSection}</strong>.</p>
+                <p>We'll notify you at <strong>{formData.email}</strong> when someone with section <strong>{formData.desiredSection}</strong> wants to swap to <strong>{formData.currentSection}</strong>.</p>
                 <p className="info-text">
-                  Keep checking back or wait for a match!
+                  You can close this page. We'll email you when a match is found.
                 </p>
               </>
             )}
